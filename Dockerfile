@@ -50,6 +50,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     supervisor \
     unzip \
     wget \
+    tar \
     && apt-get -y --purge remove exim4 exim4-base exim4-config exim4-daemon-light \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
@@ -118,6 +119,10 @@ RUN mkdir -p /usr/local/share/icingaweb2/modules/ \
     && true
 
 ADD content/ /
+
+    # Module map
+RUN mkdir -p /usr/local/share/icingaweb2/modules/map \
+    && wget -q -O - "https://github.com/nbuchwitz/icingaweb2-module-map/archive/v1.1.0.tar.gz" | tar xfz - -C /usr/local/share/icingaweb2/modules/map --strip-components 1
 
 # Final fixes
 RUN true \
