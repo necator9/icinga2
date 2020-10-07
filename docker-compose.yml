@@ -47,8 +47,8 @@ services:
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
       GF_RENDERING_SERVER_URL: http://renderer:8081/render
       GF_RENDERING_CALLBACK_URL: http://grafana:3000/
-      GF_LOG_FILTERS: rendering:debug
-      #GF_LOG_LEVEL: debug
+      # GF_LOG_FILTERS: rendering:debug
+      # GF_LOG_LEVEL: debug
 
   renderer:
     image: grafana/grafana-image-renderer:latest
@@ -64,29 +64,28 @@ services:
     # Set your hostname to the FQDN under which your
     # sattelites will reach this container
     hostname: icinga.dessau.net
-    #env_file:
-    #  - secrets_sql.env
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} 
-      ICINGA2_FEATURE_GRAPHITE: 0
-      # Important:
-      # keep the hostname graphite the same as
-      # the name of the graphite docker-container
-      ICINGA2_FEATURE_GRAPHITE_HOST: graphite
-      ICINGA2_FEATURE_GRAPHITE_PORT: 2003
-      ICINGA2_FEATURE_GRAPHITE_URL: http://graphite
-      # - ICINGA2_FEATURE_GRAPHITE_SEND_THRESHOLDS=true
-      # - ICINGA2_FEATURE_GRAPHITE_SEND_METADATA=false
-      #- ICINGAWEB2_ADMIN_USER=icingaadmin
-      #- ICINGAWEB2_ADMIN_PASS=icinga
-      #- ICINGA2_USER_FULLNAME=Icinga2 Docker Monitoring Instance
       DEFAULT_MYSQL_HOST: mysql
+      # Important:
+      # keep the hostname influxdb the same as
+      # the name of the graphite docker-container
       ICINGA2_FEATURE_INFLUXDB: 1
+      ICINGA2_FEATURE_INFLUXDB_HOST: influxdb
+      ICINGA2_FEATURE_INFLUXDB_PORT: 8086
+      ICINGA2_FEATURE_INFLUXDB_SEND_THRESHOLDS: 'true'
+      ICINGA2_FEATURE_INFLUXDB_SEND_METADATA: 'false'
+      ICINGA2_FEATURE_INFLUXDB_FLUSH_THRESHOLD: 1024 # How many data points to buffer before forcing a transfer 
+      ICINGA2_FEATURE_INFLUXDB_FLUSH_INTERVAL: 10s # How long to buffer data points before transferring to InfluxDB
+      ICINGA2_FEATURE_INFLUXDB_DB_NAME: ${INFLUX_DATABASE}
+      ICINGA2_FEATURE_INFLUXDB_DB_USER: ${INFLUX_USER}
+      ICINGA2_FEATURE_INFLUXDB_USER_PASSWORD: ${INFLUX_USER_PASSWORD}
+
+      ICINGAWEB2_ADMIN_USER: ${ICINGAWEB2_ADMIN_USER}
+      ICINGAWEB2_ADMIN_PASS: ${ICINGAWEB2_ADMIN_PASS}
+      ICINGA2_USER_FULLNAME: Icinga2 Docker Monitoring Instance
       ICINGA2_FEATURE_GRAFANA: 1
 
-      DB_SOURCE: ${INFLUX_DATABASE}
-      DB_USER: ${INFLUX_USER}
-      DB_USER_PASSWORD: ${INFLUX_USER_PASSWORD}
       GRAFANA_USERNAME: ${GRAFANA_USERNAME}
       GRAFANA_PASSWORD: ${GRAFANA_PASSWORD}
 
@@ -115,17 +114,21 @@ services:
       - "80:80"
       - "443:443"
       - "5665:5665"
+    depends_on:
+      - mysql
+      - influxdb
+      - grafana
+
   mysql:
     image: mariadb
     container_name: mysql
-    #env_file:
-    #  - secrets_sql.env
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} 
     volumes:
       - mysql:/var/lib/mysql
       # If you have previously used the container's internal DB use:
       #- ./data/icinga/lib/mysql:/var/lib/mysql
+
 volumes:
   influxdb-storage:
   chronograf-storage:
