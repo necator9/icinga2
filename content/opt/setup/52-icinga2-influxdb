@@ -8,11 +8,11 @@ if evaluate_boolean "${ICINGA2_FEATURE_INFLUXDB}"; then
 	icinga2 feature enable influxdb
 	cat >/etc/icinga2/features-available/influxdb.conf <<-END
 object InfluxdbWriter "influxdb" {
-        host = "127.0.0.1"
+        host = "influxdb"
         port = 8086
-        database = $DB_SOURCE
-        username = $DB_USER
-        password = $DB_PASSWORD
+        database = "$DB_SOURCE"
+        username = "$DB_USER"
+        password = "$DB_USER_PASSWORD"
         enable_send_thresholds = true
         enable_send_metadata = true
         flush_threshold = 1024

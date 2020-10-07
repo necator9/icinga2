@@ -1,5 +1,60 @@
 version: '2'
 services:
+  influxdb:
+    image: influxdb:latest
+    ports:
+      - 8086
+    volumes:
+      - influxdb-storage:/var/lib/influxdb
+    environment:
+      - INFLUXDB_DB=${INFLUX_DATABASE}
+      - INFLUXDB_ADMIN_USER=${INFLUX_ADMIN_USERNAME}
+      - INFLUXDB_ADMIN_PASSWORD=${INFLUX_ADMIN_PASSWORD}
+      - INFLUXDB_USER=${INFLUX_USER}
+      - INFLUXDB_USER_PASSWORD=${INFLUX_USER_PASSWORD}
+      - INFLUXDB_HTTP_AUTH_ENABLED=true
+
+  chronograf:
+    image: chronograf:latest
+    ports:
+      - '127.0.0.1:8888:8888'
+    volumes:
+      - chronograf-storage:/var/lib/chronograf
+    depends_on:
+      - influxdb
+    environment:
+      - INFLUXDB_URL=http://influxdb:8086
+      - INFLUXDB_USERNAME=${INFLUX_ADMIN_USERNAME}
+      - INFLUXDB_PASSWORD=${INFLUX_ADMIN_PASSWORD}
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - '3000:3000'
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - ./grafana-provisioning/:/etc/grafana/provisioning
+    depends_on:
+      - influxdb
+    environment:
+      # Custom env to build the grafana-provisioning/datasources
+      DB_SOURCE: ${INFLUX_DATABASE}
+      DB_USER: ${INFLUX_USER}
+      DB_USER_PASSWORD: ${INFLUX_USER_PASSWORD}
+      DB_URL: http://influxdb:8086
+      
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_USERNAME}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
+      GF_RENDERING_SERVER_URL: http://renderer:8081/render
+      GF_RENDERING_CALLBACK_URL: http://grafana:3000/
+      GF_LOG_FILTERS: rendering:debug
+      #GF_LOG_LEVEL: debug
+
+  renderer:
+    image: grafana/grafana-image-renderer:latest
+    ports:
+      - 8081
+
   icinga2:
     #image: jordan/icinga2
     build:
@@ -9,34 +64,44 @@ services:
     # Set your hostname to the FQDN under which your
     # sattelites will reach this container
     hostname: icinga.dessau.net
-    env_file:
-      - secrets_sql.env
+    #env_file:
+    #  - secrets_sql.env
     environment:
-      - ICINGA2_FEATURE_GRAPHITE=0
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} 
+      ICINGA2_FEATURE_GRAPHITE: 0
       # Important:
       # keep the hostname graphite the same as
       # the name of the graphite docker-container
-      - ICINGA2_FEATURE_GRAPHITE_HOST=graphite
-      - ICINGA2_FEATURE_GRAPHITE_PORT=2003
-      - ICINGA2_FEATURE_GRAPHITE_URL=http://graphite
+      ICINGA2_FEATURE_GRAPHITE_HOST: graphite
+      ICINGA2_FEATURE_GRAPHITE_PORT: 2003
+      ICINGA2_FEATURE_GRAPHITE_URL: http://graphite
       # - ICINGA2_FEATURE_GRAPHITE_SEND_THRESHOLDS=true
       # - ICINGA2_FEATURE_GRAPHITE_SEND_METADATA=false
       #- ICINGAWEB2_ADMIN_USER=icingaadmin
       #- ICINGAWEB2_ADMIN_PASS=icinga
       #- ICINGA2_USER_FULLNAME=Icinga2 Docker Monitoring Instance
-      - DEFAULT_MYSQL_HOST=mysql
-    volumes:
-      - ./data/icinga/cache:/var/cache/icinga2
-      - ./data/icinga/certs:/etc/apache2/ssl
-      - ./data/icinga/etc/icinga2:/etc/icinga2
-      - ./data/icinga/etc/icingaweb2:/etc/icingaweb2
-      - ./data/icinga/lib/icinga:/var/lib/icinga2
-      - ./data/icinga/lib/php/sessions:/var/lib/php/sessions
-      - ./data/icinga/log/apache2:/var/log/apache2
-      - ./data/icinga/log/icinga2:/var/log/icinga2
-      - ./data/icinga/log/icingaweb2:/var/log/icingaweb2
-      - ./data/icinga/log/mysql:/var/log/mysql
-      - ./data/icinga/spool:/var/spool/icinga2
+      DEFAULT_MYSQL_HOST: mysql
+      ICINGA2_FEATURE_INFLUXDB: 1
+      ICINGA2_FEATURE_GRAFANA: 1
+
+      DB_SOURCE: ${INFLUX_DATABASE}
+      DB_USER: ${INFLUX_USER}
+      DB_USER_PASSWORD: ${INFLUX_USER_PASSWORD}
+      GRAFANA_USERNAME: ${GRAFANA_USERNAME}
+      GRAFANA_PASSWORD: ${GRAFANA_PASSWORD}
+
+      #    volumes:
+            # - icinga:/var/cache/icinga2
+            # - icinga:/etc/apache2/ssl
+            # - icinga:/etc/icinga2
+            # - icinga:/etc/icingaweb2
+            # - icinga:/var/lib/icinga2
+            # - icinga:/var/lib/php/sessions
+            # - icinga:/var/log/apache2
+            # - icinga:/var/log/icinga2
+            # - icinga:/var/log/icingaweb2
+            # - icinga:/var/log/mysql
+            # - icinga:/var/spool/icinga2
       # Sending e-mail
       #  See: https://github.com/jjethwa/icinga2#sending-notification-mails
       #  If you want to enable outbound e-mail, edit the file mstmp/msmtprc
@@ -50,22 +115,20 @@ services:
       - "80:80"
       - "443:443"
       - "5665:5665"
-        #  graphite:
-        #    image: graphiteapp/graphite-statsd:latest
-        #    container_name: graphite
-        #    restart: on-failure:5
-        #    hostname: graphite
-        #    volumes:
-        #      - ./data/graphite/conf:/opt/graphite/conf
-        #      - ./data/graphite/storage:/opt/graphite/storage
-        #      - ./data/graphite/log/graphite:/var/log/graphite
-        #      - ./data/graphite/log/carbon:/var/log/carbon
   mysql:
     image: mariadb
     container_name: mysql
-    env_file:
-      - secrets_sql.env
+    #env_file:
+    #  - secrets_sql.env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} 
     volumes:
-      - ./data/mysql/data:/var/lib/mysql
+      - mysql:/var/lib/mysql
       # If you have previously used the container's internal DB use:
       #- ./data/icinga/lib/mysql:/var/lib/mysql
+volumes:
+  influxdb-storage:
+  chronograf-storage:
+  grafana-storage:
+  icinga:
+  mysql:

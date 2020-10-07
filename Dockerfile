@@ -122,7 +122,10 @@ ADD content/ /
 
     # Module map
 RUN mkdir -p /usr/local/share/icingaweb2/modules/map \
-    && wget -q -O - "https://github.com/nbuchwitz/icingaweb2-module-map/archive/v1.1.0.tar.gz" | tar xfz - -C /usr/local/share/icingaweb2/modules/map --strip-components 1
+    && wget -q -O - "https://github.com/nbuchwitz/icingaweb2-module-map/archive/v1.1.0.tar.gz" | tar xfz - -C /usr/local/share/icingaweb2/modules/map --strip-components 1 \
+    # Module grafana
+    && mkdir -p /usr/local/share/icingaweb2/modules/grafana \
+    && wget -q -O - "https://github.com/Mikesch-mp/icingaweb2-module-grafana/archive/v1.3.5.tar.gz" | tar xfz - -C /usr/local/share/icingaweb2/modules/grafana --strip-components 1
 
 # Final fixes
 RUN true \
