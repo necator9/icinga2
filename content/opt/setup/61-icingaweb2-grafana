@@ -1,0 +1,42 @@
+#!/bin/bash
+
+. /opt/helpers
+
+if evaluate_boolean "${ICINGA2_FEATURE_GRAFANA}"; then
+	echo "=> Enabling Icingaweb2 grafana module"
+
+	# icingaweb-graphite
+	icingacli module enable grafana
+
+#	[ -e /etc/icingaweb2/modules/graVphite ] \
+#		|| cp -r /usr/local/share/icingaweb2/modules/graphite/templates /etc/icingaweb2/modules/graphite
+
+#	ini_set /etc/icingaweb2/modules/graphite/config.ini graphite url "${ICINGA2_FEATURE_GRAPHITE_URL}"
+	cat >/etc/icingaweb2/modules/grafana/config.ini <<-END
+[grafana]
+version = "0"
+host = "localhost:3000"
+protocol = "http"
+timerangeAll = "1w/w"
+defaultdashboard = "base-metrics"
+defaultdashboardpanelid = "1"
+defaultorgid = "1"
+shadows = "0"
+theme = "light"
+datasource = "influxdb"
+accessmode = "indirectproxy"
+debug = "1"
+height = "280"
+width = "640"
+enableLink = "no"
+defaultdashboardstore = "db"
+authentication = "basic"
+username = "$GRAFANA_USERNAME"
+password = "$GRAFANA_PASSWORD"
+indirectproxyrefresh = "yes"
+END
+	        
+else
+	# Actively disable graphite, to not hit any weird bugs
+	icingacli module disable grafana || true
+fi

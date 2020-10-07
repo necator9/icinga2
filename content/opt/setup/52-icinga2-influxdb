@@ -1,0 +1,39 @@
+#!/bin/bash
+
+. /opt/helpers
+
+
+if evaluate_boolean "${ICINGA2_FEATURE_INFLUXDB}"; then
+	echo "=> Enabling Icinga2 influxdb"
+	icinga2 feature enable influxdb
+	cat >/etc/icinga2/features-available/influxdb.conf <<-END
+object InfluxdbWriter "influxdb" {
+        host = "127.0.0.1"
+        port = 8086
+        database = $DB_SOURCE
+        username = $DB_USER
+        password = $DB_PASSWORD
+        enable_send_thresholds = true
+        enable_send_metadata = true
+        flush_threshold = 1024
+        flush_interval = 10s
+        host_template = {
+          measurement = "\$host.check_command$"
+          tags = {
+            hostname = "\$host.name$"
+          }
+        }
+        service_template = {
+          measurement = "\$service.check_command$"
+          tags = {
+            hostname = "\$host.name$"
+            service = "\$service.name$"
+          }
+        }
+}
+	END
+
+else
+	# Actively disable graphite, to not hit any weird bugs
+	icinga2 feature disable influxdb || true
+fi
