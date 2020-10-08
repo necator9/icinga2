@@ -1,12 +1,66 @@
 # fork changes
 
+The dockerhub-repository - https://hub.docker.com/repository/docker/necator94/icinga2_stack
+
 By default added following features/modules:
 - icinga2 feature influxdb
 - icingaweb2 modules map and grafana
+- environment variables to configure influxdb and grafana
+- graphite is disabled
 
-Grafana and docker compose configuration are originated from https://github.com/jkehres/docker-compose-influxdb-grafana. 
+New environment variables:
 
-# icinga2
+| Environmental Variable | Default Value | Description |
+| ---------------------- | ------------- | ----------- |
+| `ICINGA2_FEATURE_INFLUXDB` | true | set to true or 1 to enable influxdb writer |
+| `ICINGA2_FEATURE_INFLUXDB_HOST` | true | hostname or IP address where influxdb is running |
+| `ICINGA2_FEATURE_INFLUXDB_PORT` | 8086 | InfluxDB port |
+| `ICINGA2_FEATURE_INFLUXDB_SEND_THRESHOLDS` | true | send min, max, warn and crit values for perf data |
+| `ICINGA2_FEATURE_INFLUXDB_SEND_METADATA` | false | send state, latency and execution_time values |
+| `ICINGA2_FEATURE_INFLUXDB_FLUSH_THRESHOLD` | 1024 | how many data points to buffer before forcing a transfer |
+| `ICINGA2_FEATURE_INFLUXDB_FLUSH_INTERVAL` | 10s | how long to buffer data points before transferring to InfluxDB |
+| `ICINGA2_FEATURE_INFLUXDB_DB_NAME` | - | name of the database (must be specified) |
+| `ICINGA2_FEATURE_INFLUXDB_DB_USER` | - | user of the database (must be specified|
+| `ICINGA2_FEATURE_INFLUXDB_USER_PASSWORD` | - | user password (must be specified) |
+| `ICINGAWEB2_MODULE_GRAFANA` | true | set to true or 1 to enable grafana module  |
+| `ICINGAWEB2_MODULE_GRAFANA_HOST` | grafana:3000 | hostname or IP address where grafana is running |
+| `ICINGAWEB2_MODULE_GRAFANA_USERNAME` | - | grafana user (must be specified) |
+| `ICINGAWEB2_MODULE_GRAFANA_PASSWORD` | - | grafana password (must be specified) |
+
+
+InfluxDB and Grafana secrets must be specified if they are enabled (no default values). 
+
+# Examples
+
+Pull the image:
+```
+docker pull necator94/icinga2_stack:latest
+```
+
+Substitute the secrets (db_name, db_user, etc.) and run the container:
+```
+docker run -p 80:80 \
+-h icinga2 \
+-t necator94/icinga2_stack:latest \
+-e ICINGA2_FEATURE_INFLUXDB_DB_NAME=db_name \
+-e ICINGA2_FEATURE_INFLUXDB_DB_USER=db_user \
+-e ICINGA2_FEATURE_INFLUXDB_DB_USER=db_user_password \
+-e ICINGAWEB2_MODULE_GRAFANA_USERNAME=grafana_user \
+-e ICINGAWEB2_MODULE_GRAFANA_PASSWORD=grafana_password
+```
+
+Docker compose is available at [github repository](https://github.com/necator9/icinga2/) and includes following components configuration:
+- icinga
+- influxdb
+- chronograf
+- grafana
+- grafana renderer
+
+Grafana and InfluxDB docker compose configuration are originated from https://github.com/jkehres/docker-compose-influxdb-grafana. 
+
+
+
+# icinga2 (original description)
 
 This repository contains the source for the [icinga2](https://www.icinga.org/icinga2/) [docker](https://www.docker.com) image.
 
