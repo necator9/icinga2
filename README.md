@@ -46,19 +46,46 @@ docker run -p 80:80 \
 -e ICINGA2_FEATURE_INFLUXDB_USER_PASSWORD=db_user_password \
 -e ICINGAWEB2_MODULE_GRAFANA_USERNAME=grafana_user \
 -e ICINGAWEB2_MODULE_GRAFANA_PASSWORD=grafana_password \
+-e MYSQL_ROOT_PASSWORD=random \
 necator94/icinga2_stack:latest
 ```
 
-Docker compose is available at [github repository](https://github.com/necator9/icinga2/) and includes following components configuration:
+Docker compose is available at [github repository](https://github.com/necator9/icinga2/) and includes configuration of the following components:
 - icinga
 - influxdb
 - chronograf
 - grafana
 - grafana renderer
 
-Grafana and InfluxDB docker compose configuration are originated from https://github.com/jkehres/docker-compose-influxdb-grafana. 
+# docker-compose
+Grafana and InfluxDB docker-compose configuration are originated from https://github.com/jkehres/docker-compose-influxdb-grafana. 
 
+Clone the repository:
+	
+	git clone https://github.com/necator9/icinga2.git
+	cd icinga2
+    
+Create `.env` file and substitute secrets:
+    
+   	# InfluxDB parameters
+	INFLUX_ADMIN_USERNAME=admin
+	INFLUX_ADMIN_PASSWORD=admin
+	INFLUX_DATABASE=icinga2
+	INFLUX_USER=icinga2
+	INFLUX_USER_PASSWORD=random
 
+	# Grafana parameters
+	GRAFANA_USERNAME=admin
+	GRAFANA_PASSWORD=admin
+
+	# Icinga parameters
+	ICINGAWEB2_ADMIN_USER=icingaadmin
+	ICINGAWEB2_ADMIN_PASS=icinga
+	MYSQL_ROOT_PASSWORD=random
+
+Run the docker-compose:
+	    
+	docker-compose up
 
 # icinga2 (original description)
 
