@@ -1,3 +1,11 @@
+# fork changes
+
+By default added following features/modules:
+- icinga2 feature influxdb
+- icingaweb2 modules map and grafana
+
+Grafana and docker compose configuration are originated from https://github.com/jkehres/docker-compose-influxdb-grafana. 
+
 # icinga2
 
 This repository contains the source for the [icinga2](https://www.icinga.org/icinga2/) [docker](https://www.docker.com) image.
