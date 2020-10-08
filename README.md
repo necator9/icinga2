@@ -46,6 +46,7 @@ docker run -p 80:80 \
 -e ICINGA2_FEATURE_INFLUXDB_USER_PASSWORD=db_user_password \
 -e ICINGAWEB2_MODULE_GRAFANA_USERNAME=grafana_user \
 -e ICINGAWEB2_MODULE_GRAFANA_PASSWORD=grafana_password \
+-e MYSQL_ROOT_PASSWORD=random \
 necator94/icinga2_stack:latest
 ```
 
