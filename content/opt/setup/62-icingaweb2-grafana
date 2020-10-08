@@ -2,7 +2,7 @@
 
 . /opt/helpers
 
-if evaluate_boolean "${ICINGA2_FEATURE_GRAFANA}"; then
+if evaluate_boolean "${ICINGAWEB2_MODULE_GRAFANA}"; then
 	echo "=> Enabling Icingaweb2 grafana module"
 
 	# icingaweb-grafana
@@ -16,7 +16,7 @@ if evaluate_boolean "${ICINGA2_FEATURE_GRAFANA}"; then
 	cat >/etc/icingaweb2/modules/grafana/config.ini <<-END
 [grafana]
 version = "0"
-host = "grafana:3000"
+host = "$ICINGAWEB2_MODULE_GRAFANA_HOST"
 protocol = "http"
 timerangeAll = "1w/w"
 defaultdashboard = "base-metrics"
@@ -32,8 +32,8 @@ width = "640"
 enableLink = "no"
 defaultdashboardstore = "db"
 authentication = "basic"
-username = "$GRAFANA_USERNAME"
-password = "$GRAFANA_PASSWORD"
+username = "$ICINGAWEB2_MODULE_GRAFANA_USERNAME"
+password = "$ICINGAWEB2_MODULE_GRAFANA_PASSWORD"
 indirectproxyrefresh = "yes"
 END
 	        

@@ -14,7 +14,15 @@ ENV APACHE2_HTTP=REDIRECT \
     ICINGA2_FEATURE_DIRECTOR="true" \
     ICINGA2_FEATURE_DIRECTOR_KICKSTART="true" \
     ICINGA2_FEATURE_DIRECTOR_USER="icinga2-director" \
-    MYSQL_ROOT_USER=root
+    MYSQL_ROOT_USER=root \
+    ICINGA2_FEATURE_INFLUXDB="true" \
+    ICINGA2_FEATURE_INFLUXDB_HOST=influxdb \
+    ICINGA2_FEATURE_INFLUXDB_PORT=8086 \
+    ICINGA2_FEATURE_INFLUXDB_SEND_THRESHOLDS="true" \
+    ICINGA2_FEATURE_INFLUXDB_SEND_METADATA="false" \
+    ICINGA2_FEATURE_INFLUXDB_FLUSH_THRESHOLD=1024 \
+    ICINGA2_FEATURE_INFLUXDB_FLUSH_INTERVAL=10s
+      
 
 RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get update \
@@ -118,14 +126,14 @@ RUN mkdir -p /usr/local/share/icingaweb2/modules/ \
     && rm -rf /usr/local/share/icingaweb2/modules/x509/icingaweb2-module-x509-1.0.0/ \
     && true
 
-ADD content/ /
-
     # Module map
 RUN mkdir -p /usr/local/share/icingaweb2/modules/map \
     && wget -q -O - "https://github.com/nbuchwitz/icingaweb2-module-map/archive/v1.1.0.tar.gz" | tar xfz - -C /usr/local/share/icingaweb2/modules/map --strip-components 1 \
     # Module grafana
     && mkdir -p /usr/local/share/icingaweb2/modules/grafana \
     && wget -q -O - "https://github.com/Mikesch-mp/icingaweb2-module-grafana/archive/v1.3.5.tar.gz" | tar xfz - -C /usr/local/share/icingaweb2/modules/grafana --strip-components 1
+
+ADD content/ /
 
 # Final fixes
 RUN true \
