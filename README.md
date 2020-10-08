@@ -41,12 +41,12 @@ Substitute the secrets (db_name, db_user, etc.) and run the container:
 ```
 docker run -p 80:80 \
 -h icinga2 \
--t necator94/icinga2_stack:latest \
 -e ICINGA2_FEATURE_INFLUXDB_DB_NAME=db_name \
 -e ICINGA2_FEATURE_INFLUXDB_DB_USER=db_user \
--e ICINGA2_FEATURE_INFLUXDB_DB_USER=db_user_password \
+-e ICINGA2_FEATURE_INFLUXDB_USER_PASSWORD=db_user_password \
 -e ICINGAWEB2_MODULE_GRAFANA_USERNAME=grafana_user \
--e ICINGAWEB2_MODULE_GRAFANA_PASSWORD=grafana_password
+-e ICINGAWEB2_MODULE_GRAFANA_PASSWORD=grafana_password \
+necator94/icinga2_stack:latest
 ```
 
 Docker compose is available at [github repository](https://github.com/necator9/icinga2/) and includes following components configuration:
