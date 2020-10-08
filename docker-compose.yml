@@ -1,7 +1,7 @@
 version: '2'
 services:
   icinga2:
-    #image: jordan/icinga2
+          # image: necator94/icinga2_stack:latest
     build:
       context: ./
       dockerfile: Dockerfile
@@ -19,8 +19,8 @@ services:
       ICINGA2_FEATURE_INFLUXDB_PORT: 8086
       ICINGA2_FEATURE_INFLUXDB_SEND_THRESHOLDS: 'true'
       ICINGA2_FEATURE_INFLUXDB_SEND_METADATA: 'false'
-      ICINGA2_FEATURE_INFLUXDB_FLUSH_THRESHOLD: 1024 # How many data points to buffer before forcing a transfer 
-      ICINGA2_FEATURE_INFLUXDB_FLUSH_INTERVAL: 10s # How long to buffer data points before transferring to InfluxDB
+      ICINGA2_FEATURE_INFLUXDB_FLUSH_THRESHOLD: 1024 
+      ICINGA2_FEATURE_INFLUXDB_FLUSH_INTERVAL: 10s 
       ICINGA2_FEATURE_INFLUXDB_DB_NAME: ${INFLUX_DATABASE}
       ICINGA2_FEATURE_INFLUXDB_DB_USER: ${INFLUX_USER}
       ICINGA2_FEATURE_INFLUXDB_USER_PASSWORD: ${INFLUX_USER_PASSWORD}
