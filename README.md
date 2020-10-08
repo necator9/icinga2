@@ -50,6 +50,8 @@ docker run -p 80:80 \
 necator94/icinga2_stack:latest
 ```
 
+# docker-compose
+
 Docker compose is available at [github repository](https://github.com/necator9/icinga2/) and includes configuration of the following components:
 - icinga
 - influxdb
@@ -57,7 +59,6 @@ Docker compose is available at [github repository](https://github.com/necator9/i
 - grafana
 - grafana renderer
 
-# docker-compose
 Grafana and InfluxDB docker-compose configuration are originated from https://github.com/jkehres/docker-compose-influxdb-grafana. 
 
 Clone the repository:
