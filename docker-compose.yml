@@ -1,5 +1,80 @@
 version: '2'
 services:
+  icinga2:
+    #image: jordan/icinga2
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    restart: on-failure:5
+    # Set your hostname to the FQDN under which your
+    # sattelites will reach this container
+    hostname: icinga.dessau.net
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} 
+      DEFAULT_MYSQL_HOST: mysql
+      # Important:
+      # keep the hostname influxdb the same as
+      # the name of the graphite docker-container
+      ICINGA2_FEATURE_INFLUXDB: 'true'
+      ICINGA2_FEATURE_INFLUXDB_HOST: influxdb
+      ICINGA2_FEATURE_INFLUXDB_PORT: 8086
+      ICINGA2_FEATURE_INFLUXDB_SEND_THRESHOLDS: 'true'
+      ICINGA2_FEATURE_INFLUXDB_SEND_METADATA: 'false'
+      ICINGA2_FEATURE_INFLUXDB_FLUSH_THRESHOLD: 1024 # How many data points to buffer before forcing a transfer 
+      ICINGA2_FEATURE_INFLUXDB_FLUSH_INTERVAL: 10s # How long to buffer data points before transferring to InfluxDB
+      ICINGA2_FEATURE_INFLUXDB_DB_NAME: ${INFLUX_DATABASE}
+      ICINGA2_FEATURE_INFLUXDB_DB_USER: ${INFLUX_USER}
+      ICINGA2_FEATURE_INFLUXDB_USER_PASSWORD: ${INFLUX_USER_PASSWORD}
+
+      ICINGAWEB2_ADMIN_USER: ${ICINGAWEB2_ADMIN_USER}
+      ICINGAWEB2_ADMIN_PASS: ${ICINGAWEB2_ADMIN_PASS}
+      ICINGA2_USER_FULLNAME: Icinga2 Docker Monitoring Instance
+      ICINGA2_FEATURE_GRAFANA: 'true'
+
+      GRAFANA_USERNAME: ${GRAFANA_USERNAME}
+      GRAFANA_PASSWORD: ${GRAFANA_PASSWORD}
+
+    volumes:
+      - icinga_cache:/var/cache/icinga2
+   #   - icinga_apache_ssl:/etc/apache2/ssl
+      - icinga_etc:/etc/icinga2
+      - icingaweb_etc:/etc/icingaweb2
+      - icinga_var_lib:/var/lib/icinga2
+   #   - icinga_php:/var/lib/php/sessions
+   #   - icinga_apache:/var/log/apache2
+      - icinga_log:/var/log/icinga2
+      - icingaweb_log:/var/log/icingaweb2
+      - icinga_log_mysql:/var/log/mysql
+      - icinga_var_spool:/var/spool/icinga2
+
+      # Sending e-mail
+      #  See: https://github.com/jjethwa/icinga2#sending-notification-mails
+      #  If you want to enable outbound e-mail, edit the file mstmp/msmtprc
+      #  and configure to your corresponding mail setup. The default is a
+      #  Gmail example but msmtp can be used for any MTA configuration.
+      #  Change the aliases in msmtp/aliases to your recipients.
+      #  Then uncomment the rows below
+      # - ./msmtp/msmtprc:/etc/msmtprc:ro
+      # - ./msmtp/aliases:/etc/aliases:ro
+    ports:
+      - "80:80"
+      - "443:443"
+      - "5665:5665"
+    depends_on:
+      - mysql
+      - influxdb
+      - grafana
+
+  mysql:
+    image: mariadb
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} 
+    volumes:
+      - mysql:/var/lib/mysql
+      # If you have previously used the container's internal DB use:
+      #- ./data/icinga/lib/mysql:/var/lib/mysql
+   
   influxdb:
     image: influxdb:latest
     ports:
@@ -55,83 +130,17 @@ services:
     ports:
       - 8081
 
-  icinga2:
-    #image: jordan/icinga2
-    build:
-      context: ./
-      dockerfile: Dockerfile
-    restart: on-failure:5
-    # Set your hostname to the FQDN under which your
-    # sattelites will reach this container
-    hostname: icinga.dessau.net
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} 
-      DEFAULT_MYSQL_HOST: mysql
-      # Important:
-      # keep the hostname influxdb the same as
-      # the name of the graphite docker-container
-      ICINGA2_FEATURE_INFLUXDB: 1
-      ICINGA2_FEATURE_INFLUXDB_HOST: influxdb
-      ICINGA2_FEATURE_INFLUXDB_PORT: 8086
-      ICINGA2_FEATURE_INFLUXDB_SEND_THRESHOLDS: 'true'
-      ICINGA2_FEATURE_INFLUXDB_SEND_METADATA: 'false'
-      ICINGA2_FEATURE_INFLUXDB_FLUSH_THRESHOLD: 1024 # How many data points to buffer before forcing a transfer 
-      ICINGA2_FEATURE_INFLUXDB_FLUSH_INTERVAL: 10s # How long to buffer data points before transferring to InfluxDB
-      ICINGA2_FEATURE_INFLUXDB_DB_NAME: ${INFLUX_DATABASE}
-      ICINGA2_FEATURE_INFLUXDB_DB_USER: ${INFLUX_USER}
-      ICINGA2_FEATURE_INFLUXDB_USER_PASSWORD: ${INFLUX_USER_PASSWORD}
-
-      ICINGAWEB2_ADMIN_USER: ${ICINGAWEB2_ADMIN_USER}
-      ICINGAWEB2_ADMIN_PASS: ${ICINGAWEB2_ADMIN_PASS}
-      ICINGA2_USER_FULLNAME: Icinga2 Docker Monitoring Instance
-      ICINGA2_FEATURE_GRAFANA: 1
-
-      GRAFANA_USERNAME: ${GRAFANA_USERNAME}
-      GRAFANA_PASSWORD: ${GRAFANA_PASSWORD}
-
-      #    volumes:
-            # - icinga:/var/cache/icinga2
-            # - icinga:/etc/apache2/ssl
-            # - icinga:/etc/icinga2
-            # - icinga:/etc/icingaweb2
-            # - icinga:/var/lib/icinga2
-            # - icinga:/var/lib/php/sessions
-            # - icinga:/var/log/apache2
-            # - icinga:/var/log/icinga2
-            # - icinga:/var/log/icingaweb2
-            # - icinga:/var/log/mysql
-            # - icinga:/var/spool/icinga2
-      # Sending e-mail
-      #  See: https://github.com/jjethwa/icinga2#sending-notification-mails
-      #  If you want to enable outbound e-mail, edit the file mstmp/msmtprc
-      #  and configure to your corresponding mail setup. The default is a
-      #  Gmail example but msmtp can be used for any MTA configuration.
-      #  Change the aliases in msmtp/aliases to your recipients.
-      #  Then uncomment the rows below
-      # - ./msmtp/msmtprc:/etc/msmtprc:ro
-      # - ./msmtp/aliases:/etc/aliases:ro
-    ports:
-      - "80:80"
-      - "443:443"
-      - "5665:5665"
-    depends_on:
-      - mysql
-      - influxdb
-      - grafana
-
-  mysql:
-    image: mariadb
-    container_name: mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} 
-    volumes:
-      - mysql:/var/lib/mysql
-      # If you have previously used the container's internal DB use:
-      #- ./data/icinga/lib/mysql:/var/lib/mysql
 
 volumes:
   influxdb-storage:
   chronograf-storage:
   grafana-storage:
-  icinga:
   mysql:
+  icinga_cache:
+  icinga_etc:
+  icingaweb_etc:
+  icinga_var_lib:
+  icinga_log:
+  icingaweb_log:
+  icinga_log_mysql:
+  icinga_var_spool:
