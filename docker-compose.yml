@@ -1,15 +1,16 @@
 version: '2'
 services:
   icinga2:
-          # image: necator94/icinga2_stack:latest
-    build:
-      context: ./
-      dockerfile: Dockerfile
+    image: necator94/icinga2_stack:latest
+    # build:
+    #  context: ./
+    #  dockerfile: Dockerfile
     restart: on-failure:5
     # Set your hostname to the FQDN under which your
     # sattelites will reach this container
     hostname: icinga.dessau.net
     environment:
+      TZ: Europe/Berlin
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} 
       DEFAULT_MYSQL_HOST: mysql
       # Important: keep the hostname graphite the same as
@@ -36,7 +37,7 @@ services:
       ICINGA2_FEATURE_GRAPHITE: 'false'
     volumes:
       - icinga_cache:/var/cache/icinga2
-   #   - icinga_apache_ssl:/etc/apache2/ssl
+      - icinga_apache_ssl:/etc/apache2/ssl
       - icinga_etc:/etc/icinga2
       - icingaweb_etc:/etc/icingaweb2
       - icinga_var_lib:/var/lib/icinga2
@@ -46,6 +47,7 @@ services:
       - icingaweb_log:/var/log/icingaweb2
       - icinga_log_mysql:/var/log/mysql
       - icinga_var_spool:/var/spool/icinga2
+      - icinga_plugins:/usr/lib/nagios/plugins
 
       # Sending e-mail
       #  See: https://github.com/jjethwa/icinga2#sending-notification-mails
@@ -60,6 +62,9 @@ services:
       - "80:80"
       - "443:443"
       - "5665:5665"
+        #network_mode: "host"
+    dns:
+      - 10.33.21.148 
     depends_on:
       - mysql
       - influxdb
@@ -129,6 +134,8 @@ services:
     image: grafana/grafana-image-renderer:latest
     ports:
       - 8081
+    environment:
+      BROWSER_TZ: Europe/Berlin
 
 
 volumes:
@@ -144,3 +151,5 @@ volumes:
   icingaweb_log:
   icinga_log_mysql:
   icinga_var_spool:
+  icinga_apache_ssl:
+  icinga_plugins:
