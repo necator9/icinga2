@@ -37,27 +37,12 @@ services:
       ICINGA2_FEATURE_GRAPHITE: 'false'
     volumes:
       - icinga_cache:/var/cache/icinga2
-      - icinga_apache_ssl:/etc/apache2/ssl
-      - icinga_etc:/etc/icinga2
-      - icingaweb_etc:/etc/icingaweb2
       - icinga_var_lib:/var/lib/icinga2
    #   - icinga_php:/var/lib/php/sessions
-   #   - icinga_apache:/var/log/apache2
-      - icinga_log:/var/log/icinga2
-      - icingaweb_log:/var/log/icingaweb2
-      - icinga_log_mysql:/var/log/mysql
       - icinga_var_spool:/var/spool/icinga2
       - icinga_plugins:/usr/lib/nagios/plugins
-
-      # Sending e-mail
-      #  See: https://github.com/jjethwa/icinga2#sending-notification-mails
-      #  If you want to enable outbound e-mail, edit the file mstmp/msmtprc
-      #  and configure to your corresponding mail setup. The default is a
-      #  Gmail example but msmtp can be used for any MTA configuration.
-      #  Change the aliases in msmtp/aliases to your recipients.
-      #  Then uncomment the rows below
-      # - ./msmtp/msmtprc:/etc/msmtprc:ro
-      # - ./msmtp/aliases:/etc/aliases:ro
+      - icinga_etc:/etc
+      - icinga_log:/var/log
     ports:
       - "80:80"
       - "443:443"
@@ -137,7 +122,6 @@ services:
     environment:
       BROWSER_TZ: Europe/Berlin
 
-
 volumes:
   influxdb-storage:
   chronograf-storage:
@@ -145,11 +129,7 @@ volumes:
   mysql:
   icinga_cache:
   icinga_etc:
-  icingaweb_etc:
-  icinga_var_lib:
   icinga_log:
-  icingaweb_log:
-  icinga_log_mysql:
+  icinga_var_lib:
   icinga_var_spool:
-  icinga_apache_ssl:
   icinga_plugins:
