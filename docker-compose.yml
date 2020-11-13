@@ -49,7 +49,7 @@ services:
       - "5665:5665"
         #network_mode: "host"
     dns:
-      - 10.33.21.148 
+      - ${DNS_IP}
     depends_on:
       - mysql
       - influxdb
