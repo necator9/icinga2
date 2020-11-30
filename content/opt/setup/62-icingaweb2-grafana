@@ -35,7 +35,7 @@ authentication = "basic"
 username = "$ICINGAWEB2_MODULE_GRAFANA_USERNAME"
 password = "$ICINGAWEB2_MODULE_GRAFANA_PASSWORD"
 indirectproxyrefresh = "yes"
-proxytimeout = "13"
+proxytimeout = "30"
 END
 	        
 else
