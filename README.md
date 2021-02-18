@@ -2,7 +2,7 @@
 
 The dockerhub-repository - https://hub.docker.com/repository/docker/necator94/icinga2_stack
 
-Following features/modules added by default:
+Following features/modules added:
 - log to `/var/log/icinga2/icinga2.log` is disabled, use docker functionality instead, e.g. `docker-compose logs` 
 - influxdb feature for icinga2
 - modules map and grafana for icingaweb2
@@ -14,20 +14,20 @@ New environment variables:
 | Environmental Variable | Default Value | Description |
 | ---------------------- | ------------- | ----------- |
 | `ICINGA2_LOG_TO_FILE`| false | set to true or 1 to enable logs to `/var/log/icinga2/icinga2.log` |
-| `ICINGA2_FEATURE_INFLUXDB` | true | set to true or 1 to enable influxdb writer |
-| `ICINGA2_FEATURE_INFLUXDB_HOST` | true | hostname or IP address where influxdb is running |
+| `ICINGA2_FEATURE_INFLUXDB` | false | set to true or 1 to enable influxdb writer |
+| `ICINGA2_FEATURE_INFLUXDB_HOST` | influxdb | hostname or IP address where influxdb is running |
 | `ICINGA2_FEATURE_INFLUXDB_PORT` | 8086 | InfluxDB port |
 | `ICINGA2_FEATURE_INFLUXDB_SEND_THRESHOLDS` | true | send min, max, warn and crit values for perf data |
 | `ICINGA2_FEATURE_INFLUXDB_SEND_METADATA` | false | send state, latency and execution_time values |
 | `ICINGA2_FEATURE_INFLUXDB_FLUSH_THRESHOLD` | 1024 | how many data points to buffer before forcing a transfer |
 | `ICINGA2_FEATURE_INFLUXDB_FLUSH_INTERVAL` | 10s | how long to buffer data points before transferring to InfluxDB |
-| `ICINGA2_FEATURE_INFLUXDB_DB_NAME` | - | name of the database (must be specified) |
-| `ICINGA2_FEATURE_INFLUXDB_DB_USER` | - | user of the database (must be specified|
-| `ICINGA2_FEATURE_INFLUXDB_USER_PASSWORD` | - | user password (must be specified) |
-| `ICINGAWEB2_MODULE_GRAFANA` | true | set to true or 1 to enable grafana module  |
+| `ICINGA2_FEATURE_INFLUXDB_DB_NAME` | icinga2 | name of the database |
+| `ICINGA2_FEATURE_INFLUXDB_DB_USER` | icinga2 | user of the database |
+| `ICINGA2_FEATURE_INFLUXDB_USER_PASSWORD` | temp_password | user password |
+| `ICINGAWEB2_MODULE_GRAFANA` | false | set to true or 1 to enable grafana module  |
 | `ICINGAWEB2_MODULE_GRAFANA_HOST` | grafana:3000 | hostname or IP address where grafana is running |
-| `ICINGAWEB2_MODULE_GRAFANA_USERNAME` | - | grafana user (must be specified) |
-| `ICINGAWEB2_MODULE_GRAFANA_PASSWORD` | - | grafana password (must be specified) |
+| `ICINGAWEB2_MODULE_GRAFANA_USERNAME` | icinga2 | grafana user |
+| `ICINGAWEB2_MODULE_GRAFANA_PASSWORD` | temp_password | grafana password |
 
 
 When InfluxDB and Grafana are enabled their secrets must be specified (no default values). 
