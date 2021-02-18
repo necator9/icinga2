@@ -5,3 +5,4 @@
 if ! evaluate_boolean "${ICINGA2_LOG_TO_FILE}"; then
 	echo "=> Disabling Icinga2 logging to /var/log/icinga2/icinga2.log"
 	icinga2 feature disable mainlog
+fi
