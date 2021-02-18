@@ -2,9 +2,10 @@
 
 The dockerhub-repository - https://hub.docker.com/repository/docker/necator94/icinga2_stack
 
-By default added following features/modules:
-- icinga2 feature influxdb
-- icingaweb2 modules map and grafana
+Following features/modules added by default:
+- log to `/var/log/icinga2/icinga2.log` is disabled, use docker functionality instead, e.g. `docker-compose logs` 
+- influxdb feature for icinga2
+- modules map and grafana for icingaweb2
 - environment variables to configure influxdb and grafana
 - graphite is disabled
 
@@ -12,6 +13,7 @@ New environment variables:
 
 | Environmental Variable | Default Value | Description |
 | ---------------------- | ------------- | ----------- |
+| `ICINGA2_LOG_TO_FILE`| false | set to true or 1 to enable logs to `/var/log/icinga2/icinga2.log` |
 | `ICINGA2_FEATURE_INFLUXDB` | true | set to true or 1 to enable influxdb writer |
 | `ICINGA2_FEATURE_INFLUXDB_HOST` | true | hostname or IP address where influxdb is running |
 | `ICINGA2_FEATURE_INFLUXDB_PORT` | 8086 | InfluxDB port |
@@ -28,7 +30,7 @@ New environment variables:
 | `ICINGAWEB2_MODULE_GRAFANA_PASSWORD` | - | grafana password (must be specified) |
 
 
-InfluxDB and Grafana secrets must be specified if they are enabled (no default values). 
+When InfluxDB and Grafana are enabled their secrets must be specified (no default values). 
 
 # Examples
 
