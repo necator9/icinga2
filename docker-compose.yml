@@ -44,9 +44,9 @@ services:
       - icinga_etc:/etc
       - icinga_log:/var/log
     ports:
-      - "80:80"
-      - "443:443"
-      - "5665:5665"
+      - '80:80'
+      - '443:443'
+      - '5665:5665'
         #network_mode: "host"
     dns:
       - ${DNS_IP}
@@ -55,7 +55,7 @@ services:
       - influxdb
       - grafana
     logging:
-      driver: "none"
+      driver: 'none'
       options:
         max-size: 100m
 
@@ -69,14 +69,14 @@ services:
       # If you have previously used the container's internal DB use:
       #- ./data/icinga/lib/mysql:/var/lib/mysql
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: 10m
+        max-size: '10m'
 
   influxdb:
     image: influxdb:latest
     ports:
-      - 8086
+      - '127.0.0.1:8086:8086'
     volumes:
       - influxdb-storage:/var/lib/influxdb
     environment:
@@ -88,9 +88,9 @@ services:
       INFLUXDB_HTTP_AUTH_ENABLED: 'true'
       INFLUXDB_HTTP_LOG_ENABLED: 'false'
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: 10m
+        max-size: '10m'
 
   chronograf:
     image: chronograf:latest
@@ -105,9 +105,9 @@ services:
       INFLUXDB_USERNAME: ${INFLUX_ADMIN_USERNAME}
       INFLUXDB_PASSWORD: ${INFLUX_ADMIN_PASSWORD}
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: 10m
+        max-size: '10m'
 
   grafana:
     image: grafana/grafana:latest
@@ -139,13 +139,13 @@ services:
   renderer:
     image: grafana/grafana-image-renderer:latest
     ports:
-      - 8081
+      - '172.0.0.1:8081:8081'
     environment:
       BROWSER_TZ: Europe/Berlin
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: 10m
+        max-size: '10m'
 
 volumes:
   influxdb-storage:
