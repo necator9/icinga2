@@ -5,7 +5,7 @@ services:
     # build:
     #  context: ./
     #  dockerfile: Dockerfile
-    restart: on-failure:5
+    restart: always
     # Set your hostname to the FQDN under which your
     # sattelites will reach this container
     hostname: icinga.dessau.net
@@ -61,6 +61,7 @@ services:
 
   mysql:
     image: mariadb
+    restart: always
     container_name: mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} 
@@ -75,6 +76,7 @@ services:
 
   influxdb:
     image: influxdb:latest
+    restart: always
     ports:
       - '127.0.0.1:8086:8086'
     volumes:
@@ -94,6 +96,7 @@ services:
 
   chronograf:
     image: chronograf:latest
+    restart: always
     ports:
       - '127.0.0.1:8888:8888'
     volumes:
@@ -111,6 +114,7 @@ services:
 
   grafana:
     image: grafana/grafana:latest
+    restart: always
     ports:
       - '3000:3000'
     volumes:
@@ -138,6 +142,7 @@ services:
 
   renderer:
     image: grafana/grafana-image-renderer:latest
+    restart: always
     ports:
       - '127.0.0.1:8081:8081'
     environment:
