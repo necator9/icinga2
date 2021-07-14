@@ -78,8 +78,8 @@ services:
     image: influxdb:latest
     restart: always
     ports:
-      # External port 8087 is chosen because docker-proxy uses the same port on localhost 
-      - '127.0.0.1:8086:8087'
+      # External port 8087 is chosen because docker-proxy uses port 8086 on localhost 
+      - '127.0.0.1:8087:8086'
     volumes:
       - influxdb-storage:/var/lib/influxdb
     environment:
